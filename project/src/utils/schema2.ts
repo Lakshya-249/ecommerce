@@ -25,6 +25,9 @@ export interface cart {
   user?: string;
   product?: product;
   quantity?: number;
+  size?: string;
+  color?: string;
+  discount?: number;
 }
 
 export interface product {
@@ -35,7 +38,7 @@ export interface product {
   product_desc?: string;
   product_type?: string;
   amount?: number;
-  size?: string;
+  size?: Array<string>;
   tax?: number;
   category?: string;
   colors?: Array<color>;
@@ -73,4 +76,40 @@ export interface shoppingInfo {
   _id?: string;
   info?: Array<{ key?: string; value?: string }>;
   additionalInfo?: Array<{ key?: string; value?: string }>;
+}
+
+export interface inventory_orderDetails {
+  _id: string;
+  user: string;
+  product: product;
+  total_amount: number;
+  quantity: number;
+  discount: number;
+  color: string;
+  size: any;
+  status: string;
+  tax: number;
+  order_date: string;
+  address: address;
+  delivery_date: string;
+  payment_method: string;
+  payment_status: string;
+}
+
+export interface inventory_order {
+  _id: string;
+  user: string;
+  product: product;
+  total_amount: number;
+  quantity: number;
+  discount: number;
+  color: string;
+  size: any;
+  status: string;
+  tax: number;
+  order_date: string;
+  address: {
+    _id: string;
+    name: string;
+  };
 }

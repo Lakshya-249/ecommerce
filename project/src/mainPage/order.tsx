@@ -1,7 +1,9 @@
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getRequest } from "../utils/handleApi";
+import { inventory_order } from "../utils/schema2";
 
 function Order() {
   const navigate = useNavigate();
@@ -9,12 +11,28 @@ function Order() {
   const handleToggle = () => {
     setBr(!showBr);
   };
-  const orders: Array<string> = [
-    "Orders",
-    "Not yet shipped",
-    "Cancelled Orders",
-  ];
+  const [inventory, setinventory] = useState<Array<inventory_order>>([]);
+  const orders: Array<string> = ["Delivered", "Pending", "Cancelled"];
   const [order, setOrder] = useState<string>(orders[0]);
+  const [msg, setMsg] = useState<string>("");
+  useEffect(() => {
+    const fetch = async () => {
+      const data = await getRequest(`order?status=${order}`);
+      console.log(data);
+      if (!data.err) {
+        setinventory([...data]);
+      } else setinventory([]);
+
+      if (!data.length) {
+        if (order === "Delivered") setMsg("No orders found for this status");
+        else if (order === "Pending") setMsg("No pending orders found");
+        else setMsg("No Cancelled orders found");
+      } else {
+        setMsg("");
+      }
+    };
+    fetch();
+  }, [order]);
   const toggleOrder = (val: number) => {
     setOrder(orders[val]);
     handleToggle();
@@ -44,35 +62,45 @@ function Order() {
           ""
         )}
       </div>
-      {[...Array(5)].map((_, i) => (
+      {inventory.map((item, i) => (
         <div
           key={i}
-          className="w-[70%] max-sm:w-full rounded-lg border overflow-hidden border-gray-500"
+          className="w-[70%] max-sm:w-full rounded-lg shadow-2xl overflow-hidden"
         >
           <div className="w-full text-sm max-sm:text-xs text-gray-300 bg-gray-400/5 py-3 px-5 flex items-center justify-between">
             <div className="flex space-x-10">
               <div>
                 <p>ORDER PLACED</p>
-                <p className="text-gray-400">20-04-2024</p>
+                <p className="text-gray-400">
+                  {item?.order_date.split("T")[0]}
+                </p>
               </div>
               <div>
                 <p>TOTAL</p>
-                <p className="text-gray-400">$500.78</p>
+                <p className="text-gray-400">$ {item?.total_amount}</p>
               </div>
               <div>
                 <p>SHIP TO</p>
                 <p className="hover:cursor-pointer text-gray-400 hover:text-blue-400">
-                  Dhruv Singh <FontAwesomeIcon icon={faChevronDown} />
+                  {item?.address?.name} <FontAwesomeIcon icon={faChevronDown} />
                 </p>
               </div>
             </div>
-            <p className="max-sm:hidden">ORDER_ID#1330u38233274236125tr662</p>
+            <p className="max-sm:hidden">ORDER_ID#{item?._id}</p>
           </div>
-          <div className="border-t border-gray-500 px-5 max-sm:px-3.5 pt-5 pb-2">
+          <div className=" px-5 max-sm:px-3.5 pt-5 pb-2">
             <div className="flex justify-between flex-wrap">
-              <p className="text-lg">Delivered 28 July</p>
+              <p className="text-lg">
+                {order.trim() === "Pending"
+                  ? "Delivery in process"
+                  : `Delivered on 28 July`}
+              </p>
               <button
-                onClick={() => navigate("/account/orderDetail")}
+                onClick={() =>
+                  navigate(
+                    `/account/orderDetail?status=${order}&detail=123&id=${item._id}`
+                  )
+                }
                 className={`py-2.5 px-5 rounded-xl 
                     ${
                       order.trim() === "Not yet shipped"
@@ -81,22 +109,28 @@ function Order() {
                     }
             hover:bg-gray-500/20 active:bg-black/10 max-sm:text-xs`}
               >
-                {order.trim() !== "Not yet shipped"
+                {order.trim() !== "Pending"
                   ? "View Order"
                   : "Track or view order"}
               </button>
             </div>
             <div className="flex pt-3 space-x-5">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="w-[4rem] h-[4rem] bg-white"></div>
-              ))}
+              <div key={i} className="w-[5rem] rounded-xl bg-white"></div>
+              <div>
+                <p>{item?.product?.name}</p>
+                <p className="text-sm truncate text-gray-400">
+                  {item?.product?.product_type}, {item?.product?.product_desc}
+                </p>
+                <p className="pt-3">$ {item?.product?.amount}</p>
+              </div>
             </div>
           </div>
           <div className="px-5 py-3">
-            <p>Total Items: 3</p>
+            <p>Total Items: {item?.quantity}</p>
           </div>
         </div>
       ))}
+      {msg && <p className="text-sm text-gray-400">{msg}</p>}
     </div>
   );
 }

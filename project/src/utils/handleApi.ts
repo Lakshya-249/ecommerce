@@ -1,4 +1,4 @@
-import { getToken } from "./authentication";
+import { getToken, removeToken } from "./authentication";
 
 const url = import.meta.env.VITE_BASE_URL;
 
@@ -19,8 +19,12 @@ const request = async (
 
     const data = await response.json();
 
+    if (response.status === 401) {
+      removeToken();
+      window.location.href = "http://localhost:5173/login";
+    }
     if (!response.ok) {
-      return { err: "Some error occurred" };
+      return { err: data.message };
     }
 
     return data;

@@ -30,6 +30,8 @@ function ProductPage() {
   const [colorImages, setColorImages] = useState<color>();
   const [image, setImage] = useState<string>();
   const [rating, setRating] = useState<number>();
+  const [colorm, setColor] = useState<string>();
+  const [size, setSize] = useState<string>();
   const id = search.get("id");
   useEffect(() => {
     const fetchData = async () => {
@@ -50,9 +52,12 @@ function ProductPage() {
       setDetail(data);
       setColorImages(data.colors[0]);
       setImage(data.colors[0].images[0]);
+      setColor(data.colors[0].hex);
+      setSize(data.size[0]);
     };
     fetchData();
   }, [search]);
+
   const handleColor = (id: string) => {
     const data = detail?.colors?.filter(
       (c) => c._id?.toString() === id.toString()
@@ -62,15 +67,24 @@ function ProductPage() {
       if (data[0].images?.length) setImage(data[0].images[0]);
     }
   };
+
+  const handleSize = (size: string) => {
+    setSize(size);
+  };
+
   const addToCart = async () => {
     if (getToken() === "") {
-      toast.error("You need to be logged in write the view reviews");
+      toast.error("You need to be logged in to add to cart");
       return;
     }
     const data = await postRequest("cart", {
       productId: id,
       quantity: itemNum,
+      color: colorm,
+      size: size,
     });
+    console.log(data);
+
     if (!data.err) {
       toast.success(data.message);
     } else {
@@ -144,8 +158,8 @@ function ProductPage() {
           </div>
         </div>
         <div className="w-[40%] max-sm:w-full space-y-5 py-4 px-7">
-          <p>
-            {detail?.brand},{detail?.name}, {detail?.product_desc}
+          <p className="text-lg">
+            {detail?.brand}, {detail?.name}, {detail?.product_desc}
           </p>
           <div className="flex flex-wrap max-sm:space-y-2 space-x-5 items-center">
             <div className="flex items-center space-x-1">
@@ -182,7 +196,11 @@ function ProductPage() {
                 [...detail.size].map((s, i) => (
                   <div
                     key={i}
-                    className="w-[3rem] h-[3rem] m-1 justify-center flex items-center rounded-md ring-1 ring-gray-500"
+                    onClick={() => handleSize(s)}
+                    className={`w-[3rem] h-[3rem] m-1 hover:cursor-pointer 
+                    justify-center flex items-center rounded-md ring-1 ${
+                      size === s ? "ring-blue-500" : "ring-gray-500"
+                    } `}
                   >
                     {s}
                   </div>
@@ -196,15 +214,18 @@ function ProductPage() {
                 [...detail?.colors].map((color, i) => (
                   <div
                     key={i}
-                    onClick={() => handleColor(color._id || "")}
+                    onClick={() => {
+                      handleColor(color._id || "");
+                      setColor(color.hex);
+                    }}
                     className={`w-[3rem] h-[3rem] m-1 ${
-                      i == 2 ? "" : "ring-gray-400"
+                      color.hex === colorm ? "ring-blue-500" : "ring-gray-400"
                     } justify-center flex items-center hover:cursor-pointer rounded-md ring-1`}
                   >
                     <div
                       style={{ backgroundColor: `${color.hex}` }}
                       className={`w-[1.5rem] h-[1.5rem] rounded-full`}
-                    ></div>
+                    />
                   </div>
                 ))}
             </div>

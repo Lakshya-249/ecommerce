@@ -36,6 +36,7 @@ function Login_security() {
   }, []);
   const handleLogOut = () => {
     removeToken();
+    navigate("/login");
   };
   return (
     <div className="w-full space-y-6 pb-5">

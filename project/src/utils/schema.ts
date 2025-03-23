@@ -33,6 +33,7 @@ export interface userDetails {
 }
 
 export const states: Array<string> = [
+  "Select",
   "Andhra Pradesh",
   "Arunachal Pradesh",
   "Assam",
@@ -72,6 +73,7 @@ export const states: Array<string> = [
 ];
 
 export const contries: Array<string> = [
+  "Select",
   "Afghanistan",
   "Albania",
   "Algeria",

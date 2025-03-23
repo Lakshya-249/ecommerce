@@ -22,7 +22,7 @@ function CommentModal({ onClose }: { onClose: () => void }) {
       productId: id,
     });
     if (data?.err) {
-      toast.error("Failed to add comment");
+      toast.error(data.err);
       return;
     }
     toast.success("Comment added successfully");

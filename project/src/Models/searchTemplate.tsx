@@ -155,7 +155,9 @@ function SearchTemplate() {
             hover:transform m-5 max-sm:m-2`}
             >
               <div
-                onClick={() => navigate("/productPage/specifics")}
+                onClick={() =>
+                  navigate(`/productPage/specifics?id=${product._id}`)
+                }
                 className={`${
                   block ? "w-full h-[60%]" : "h-full w-[35%]"
                 } bg-slate-300`}
@@ -194,11 +196,7 @@ function SearchTemplate() {
                   ) : (
                     ""
                   )}
-                  <p
-                    className={`text-sm text-gray-400 ${
-                      block ? "truncate" : " max-sm:truncate"
-                    } `}
-                  >
+                  <p className={`text-sm text-gray-400 truncate`}>
                     {product.name}, {product.product_desc}
                   </p>
                   {!block ? (

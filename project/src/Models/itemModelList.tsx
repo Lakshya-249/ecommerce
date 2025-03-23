@@ -28,14 +28,16 @@ function ItemModelList({ item }: { item: string }) {
     };
     fetch();
   }, []);
-  const addToCart = async (id?: string) => {
+  const addToCart = async (product: product) => {
     if (getToken() === "") {
       toast.error("You need to be logged in write the view reviews");
       return;
     }
     const data = await postRequest("cart", {
-      productId: id,
+      productId: product._id,
       quantity: 1,
+      size: product.size ? product.size[0] : "",
+      color: product.colors ? product.colors[0].hex : "",
     });
     if (!data.err) {
       toast.success(data.message);
@@ -98,14 +100,14 @@ function ItemModelList({ item }: { item: string }) {
                 </div>
                 <div className="h-[40%] flex flex-col text-left bg-gray-500/15 justify-between p-2">
                   <div className="px-2">
-                    <p className="text-lg font-semibold">${100 + i}</p>
+                    <p className="text-lg font-semibold">${product.amount}</p>
                     <p className="text-sm text-gray-400 truncate">
                       {product.name}, {product.product_desc}
                     </p>
                   </div>
                   <div className="flex space-x-3 px-1">
                     <button
-                      onClick={() => addToCart(product._id)}
+                      onClick={() => addToCart(product)}
                       className="p-2 font-semibold bg-black/30 active:bg-black/30
                      hover:bg-gray-600/10 text-sm w-full rounded-xl"
                     >

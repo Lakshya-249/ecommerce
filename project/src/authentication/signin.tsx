@@ -44,7 +44,9 @@ const Signintemplate = () => {
         email: formdata.username,
         password: formdata.password,
       });
-      if (data.err >= 400) {
+      console.log(data);
+
+      if (data.err) {
         setusername(false);
         return;
       }

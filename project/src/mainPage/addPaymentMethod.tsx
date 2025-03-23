@@ -5,7 +5,7 @@ import img2 from "../assets/mastercard-svgrepo-com.svg";
 import img3 from "../assets/american-express-svgrepo-com.svg";
 import { useState } from "react";
 import { account } from "../utils/schema2";
-import { postRequest, putRequest } from "../utils/handleApi";
+import { postRequest } from "../utils/handleApi";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
@@ -13,16 +13,11 @@ import { useNavigate } from "react-router-dom";
 function AddPaymentMethod() {
   const navigate = useNavigate();
   const [account, setAccount] = useState<account>();
-  const [defaultAccount, setDefaultAccount] = useState<boolean>(false);
   const handleAccount = (
     e: React.ChangeEvent<HTMLInputElement>,
     val: string
   ) => {
     setAccount({ ...account, [val]: e.target.value });
-  };
-  const handleDefault = () => {
-    setAccount({ ...account, ["default"]: !defaultAccount });
-    setDefaultAccount(!defaultAccount);
   };
   const handleSubmit = async () => {
     toast("Processing request...");
@@ -32,9 +27,6 @@ function AddPaymentMethod() {
     } else {
       toast.success(newaccount.message);
       navigate("/account/paymentDetails");
-    }
-    if (defaultAccount) {
-      await putRequest(`account/${newaccount._id}`, {});
     }
   };
   return (
@@ -93,12 +85,6 @@ function AddPaymentMethod() {
           </div>
         </div>
       </div>
-      <label className="flex space-x-2 py-5 hover:cursor-pointer items-start">
-        <input onClick={handleDefault} type="checkbox" className="mt-1" />
-        <p className="text-sm text-gray-400">
-          By clicking on this you set this account to default for transactions
-        </p>
-      </label>
       <div className="flex space-x-3">
         <button
           onClick={() => navigate("/account/paymentDetails")}

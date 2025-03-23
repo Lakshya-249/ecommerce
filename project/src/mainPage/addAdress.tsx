@@ -15,12 +15,12 @@ function AddAdress() {
   const [country, setCountry] = useState<string>(contries[0]);
   const [state, setState] = useState<string>(states[0]);
   const [address, setAddress] = useState<address>();
-  const [defaultAddress, setDefaultAddress] = useState<boolean>(false);
   const [search] = useSearchParams();
   const type = search.get("type");
   const id = search.get("id");
   useEffect(() => {
     const fetchData = async () => {
+      if (id === undefined || id === null) return;
       const data = await getRequest(`address/${id}`);
       if (data?.err) {
         toast.error("Address not found");
@@ -30,10 +30,10 @@ function AddAdress() {
     };
     fetchData();
   }, []);
-  const handleDefault = async () => {
-    setAddress({ ...address, default: !defaultAddress });
-    setDefaultAddress(!defaultAddress);
-  };
+  // const handleDefault = async () => {
+  //   setAddress({ ...address, default: !defaultAddress });
+  //   setDefaultAddress(!defaultAddress);
+  // };
   const handleBr = () => {
     setShowBr(!showBr);
   };
@@ -67,9 +67,6 @@ function AddAdress() {
       navigate("/account/address");
     } else {
       toast.error(data.err);
-    }
-    if (defaultAddress) {
-      await putRequest(`setDefault/${id}`, {});
     }
   };
   return (
@@ -121,42 +118,42 @@ function AddAdress() {
         <p>Full name (First and Last name)</p>
         <input
           onChange={(e) => handleAddressChange(e, "name")}
-          value={address?.name}
+          value={address?.name || ""}
           type="text"
           className="w-full px-5 py-2 rounded-lg border bg-inherit border-gray-500"
         />
         <p>Mobile number</p>
         <input
           onChange={(e) => handleAddressChange(e, "phone")}
-          value={address?.phone}
+          value={address?.phone || ""}
           type="text"
           className="w-full px-5 py-2 rounded-lg border bg-inherit border-gray-500"
         />
         <p>Pincode</p>
         <input
           onChange={(e) => handleAddressChange(e, "pincode")}
-          value={address?.pincode}
+          value={address?.pincode || ""}
           type="text"
           className="w-full px-5 py-2 rounded-lg border bg-inherit border-gray-500"
         />
         <p>Flat, House no., Building, Company, Apartment</p>
         <input
           onChange={(e) => handleAddressChange(e, "addressLine1")}
-          value={address?.addressLine1}
+          value={address?.addressLine1 || ""}
           type="text"
           className="w-full px-5 py-2 rounded-lg border bg-inherit border-gray-500"
         />
         <p>Area, Street, Sector, Village</p>
         <input
           onChange={(e) => handleAddressChange(e, "addressLine2")}
-          value={address?.addressLine2}
+          value={address?.addressLine2 || ""}
           type="text"
           className="w-full px-5 py-2 rounded-lg border bg-inherit border-gray-500"
         />
         <p>Landmark</p>
         <input
           onChange={(e) => handleAddressChange(e, "landmark")}
-          value={address?.landmark}
+          value={address?.landmark || ""}
           type="text"
           className="w-full px-5 py-2 rounded-lg border bg-inherit border-gray-500"
         />
@@ -165,7 +162,7 @@ function AddAdress() {
             <p>Town/City</p>
             <input
               onChange={(e) => handleAddressChange(e, "town_city")}
-              value={address?.town_city}
+              value={address?.town_city || ""}
               type="text"
               className="w-full px-5 py-2 rounded-lg border bg-inherit border-gray-500"
             />
@@ -199,12 +196,6 @@ function AddAdress() {
               )}
             </div>
           </div>
-        </div>
-        <div className="w-full py-4">
-          <label className="flex space-x-2 hover:cursor-pointer">
-            <input type="checkbox" onChange={handleDefault} />
-            <p>Save this as default address for deliveries</p>
-          </label>
         </div>
       </div>
       <button
