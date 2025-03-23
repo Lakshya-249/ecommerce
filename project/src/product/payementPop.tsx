@@ -22,6 +22,7 @@ function PayementPop({
   const navigate = useNavigate();
   const [address, setAddress] = useState<address>();
   const [payment_method, setMethod] = useState<string>();
+  console.log(payment_method);
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
