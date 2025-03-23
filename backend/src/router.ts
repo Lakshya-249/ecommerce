@@ -44,8 +44,14 @@ import {
   getWishList,
   removeFromCart,
   removeFromWishList,
+  updateItemInCart,
 } from "./controllers/cart";
-import { addOrder, cancelOrder, getOrders } from "./controllers/order";
+import {
+  addOrder,
+  cancelOrder,
+  chekOutOrder,
+  getOrders,
+} from "./controllers/order";
 import {
   addReview,
   deleteReview,
@@ -92,6 +98,7 @@ router.get("/listAccount", listAccounts);
 router.delete("/account/:id", deleteAccount);
 
 router.post("/cart", addToCart);
+router.put("/cart/:id", updateItemInCart);
 router.get("/cart", getCart);
 router.delete("/cart/:id", removeFromCart);
 
@@ -106,5 +113,7 @@ router.delete("/review/:id", deleteReview);
 router.post("/wishlist", addToWishList);
 router.get("/wishlist", getWishList);
 router.put("/wishlist/:id", removeFromWishList);
+
+router.post("/chekout", chekOutOrder);
 
 export default router;

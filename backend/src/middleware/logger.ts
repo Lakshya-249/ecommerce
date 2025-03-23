@@ -38,7 +38,7 @@ const handleRequest = async (
     }
     const user = await User.findById((decodedToken as JwtPayload).id);
     if (!user) {
-      res.status(403).json({ message: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
     req.user = user;

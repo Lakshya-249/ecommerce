@@ -36,10 +36,17 @@ const addAddress = async (req: CustomRequest, res: Response): Promise<void> => {
       res.status(400).json({ message: "All fields are required" });
       return;
     }
-    const newAddress = new Address({ ...req.body, user: id });
+    await Address.updateOne(
+      { user: id, default: true },
+      {
+        $set: { default: false },
+      }
+    );
+    const newAddress = new Address({ ...req.body, user: id, default: true });
     await newAddress.save();
     user.addresses.push(newAddress._id);
     await user.save();
+
     res.json({ message: "Address added succesfully", newAddress });
   } catch (err) {
     console.log(err);
@@ -79,16 +86,30 @@ const listAddresses = async (
   res: Response
 ): Promise<void> => {
   try {
-    const id = req.user?._id;
-    const user = await User.findById(id);
+    const userId = req.user?._id;
+    const { defaultOnly } = req.query;
+
+    // Check if user exists
+    const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
     }
-    const addresses = await Address.find({ user: id });
-    res.json(addresses);
+
+    // Fetch addresses based on query parameter
+    let addresses;
+    if (defaultOnly === "true") {
+      // Get only the default address
+      addresses = await Address.findOne({ user: userId, default: true });
+    } else {
+      // Get all addresses
+      addresses = await Address.find({ user: userId });
+    }
+
+    // If no addresses found, return an empty array or null
+    res.json(addresses || []);
   } catch (err) {
-    console.log(err);
+    console.error("Error fetching addresses:", err);
     res.status(500).json({ message: "Server Error" });
   }
 };

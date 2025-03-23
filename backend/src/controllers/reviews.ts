@@ -1,24 +1,43 @@
 import { Response } from "express";
-import { Product, Review, User } from "../Models/schemas";
+import { Order, Product, Review, User } from "../Models/schemas";
 import { CustomRequest } from "../middleware/logger";
 
 const addReview = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
     const { productId, rating, comment } = req.body;
     const userId = req.user?._id;
+
+    // Check if the user has purchased the product
+    const orderExists = await Order.findOne({
+      user: userId,
+      product: productId,
+      status: { $in: ["Pending", "Delivered"] }, // Consider orders that are 'Pending' or 'Delivered'
+    });
+
+    if (!orderExists) {
+      res
+        .status(403)
+        .json({ message: "You can only review products you have purchased." });
+      return;
+    }
+
+    // Create the review if the user has purchased the product
     const review = new Review({
       user: userId,
       product: productId,
-      rating: rating,
-      comment: comment,
+      rating,
+      comment,
     });
     await review.save();
+
+    // Add the review to the product's reviews array
     const product = await Product.findById(productId);
     product?.reviews.push(review._id);
     await product?.save();
+
     res.status(201).json({ message: "Review added successfully" });
   } catch (error) {
-    console.error(error);
+    console.error("Error adding review:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -6,7 +6,7 @@ import { Types } from "mongoose";
 const addToCart = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
     const id = req.user?._id;
-    const { productId, quantity } = req.body;
+    const { productId, quantity, color, size } = req.body;
     const cartavailable = await Cart.findOne({ user: id, product: productId });
     if (cartavailable) {
       res.status(200).json({ message: "Already available in cart" });
@@ -16,10 +16,34 @@ const addToCart = async (req: CustomRequest, res: Response): Promise<void> => {
       user: id,
       product: productId,
       quantity: quantity,
+      color: color || "",
+      size: size || "",
     });
     await cart.save();
     res.status(200).json({
       message: "Product added to cart successfully",
+      data: cart,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const updateItemInCart = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { quantity } = req.body;
+    const { id } = req.params;
+    const cart = await Cart.findByIdAndUpdate(
+      id,
+      { quantity: quantity },
+      { new: true }
+    );
+    res.status(200).json({
+      message: "Quantity updated successfully",
       data: cart,
     });
   } catch (err) {
@@ -137,4 +161,5 @@ export {
   addToWishList,
   removeFromWishList,
   getWishList,
+  updateItemInCart,
 };

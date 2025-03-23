@@ -15,7 +15,12 @@ const addAccount = async (req: CustomRequest, res: Response): Promise<void> => {
       res.status(400).json({ message: "All fields are required" });
       return;
     }
-    const newAccount = new Account({ ...req.body, user: id });
+    await Account.updateOne(
+      { user: id, default: true },
+      { default: false },
+      { new: true }
+    );
+    const newAccount = new Account({ ...req.body, user: id, default: true });
     await newAccount.save();
     user.accounts.push(newAccount._id);
     await user.save();

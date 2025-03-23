@@ -35,7 +35,7 @@ const colorSchema = new mongoose.Schema({
 const reviewSchema = new mongoose.Schema({
   product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  rating: { type: Number, min: 1, max: 5 },
+  rating: { type: Number, min: 0, max: 5 },
   comment: { type: String },
 });
 
@@ -117,8 +117,12 @@ const accountSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+  product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
   total_amount: { type: Number, required: true },
+  quantity: { type: Number, required: true },
+  discount: { type: Number },
+  color: { type: String },
+  size: { type: Number },
   status: {
     type: String,
     enum: ["Pending", "Delivered", "Cancelled"],
@@ -128,12 +132,24 @@ const orderSchema = new mongoose.Schema({
   order_date: { type: Date, default: Date.now },
   delivery_date: { type: Date },
   address: { type: mongoose.Schema.Types.ObjectId, ref: "Address" },
+  payment_method: {
+    type: String,
+    enum: ["Online", "Cash on Delivery"],
+    required: true,
+  },
+  payment_status: {
+    type: String,
+    enum: ["Paid", "Unpaid"],
+    default: "Unpaid",
+  },
 });
 
 const cartSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
   quantity: { type: Number, required: true },
+  color: { type: String },
+  size: { type: String },
   discount: { type: Number },
 });
 
